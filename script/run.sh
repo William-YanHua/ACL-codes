@@ -1,0 +1,66 @@
+#!/bin/bash
+current_path=`pwd`
+task_name=$1
+gpu_index=$2
+pretrained_file_path=$current_path/../chinese-bert-wwm-ext
+model_path=$current_path/model_weights/$task_name/strengthen-attention-constraint-bert-5fold/
+log_file=$current_path/log/$task_name/training_stre_att_constraint-bert-5fold.log
+CUDA_VISIBLE_DEVICES=$gpu_index nohup python -u $task_name.py \
+	--train=True \
+    --eval=True \
+    --random_seed=42 \
+    --meaning_size=100 \
+    --pretrained_file_folder=$current_path/../PretrainedEmbedding/ \
+    --cache_file=True \
+    --dataset_file_folder=$current_path/../datasets/ \
+    --validation_folder=5 \
+    --train_rate=0.6 \
+    --test_rate=0.2 \
+    --epochs=50 \
+    --echo_per_step=50 \
+    --batch_size=4 \
+    --weight_decay=0e-3 \
+    --learning_rate=1e-3 \
+    --num_warmup_steps=50 \
+    --model_path=$model_path \
+    --devices=cuda \
+    --norm_type=2 \
+	--accumulation_step=3 \
+    --max_grad_norm=1e2 \
+    --comment_dropout_rate=0.2 \
+    --comment_context_dropout_rate=0.4 \
+    --early_stop=True \
+    --patience=10 \
+    --pretrained_file_path=$pretrained_file_path \
+    --position_dim=50 \
+    --position_padding_idx=0 \
+	--mode=bert \
+    >> $log_file 2>&1 &
+
+# best 
+# CUDA_VISIBLE_DEVICES=$gpu_index nohup python -u $task_name.py \
+#     --train=True \
+#     --eval=True \
+#     --random_seed=42 \
+#     --meaning_size=100 \
+#     --pretrained_file_folder=$current_path/../PretrainedEmbedding/ \
+#     --cache_file=True \
+#     --dataset_file_folder=$current_path/../datasets/ \
+#     --validation_folder=1 \
+#     --train_rate=0.6 \
+#     --test_rate=0.2 \
+#     --epochs=50 \
+#     --echo_per_step=100 \
+#     --batch_size=12 \
+#     --weight_decay=0e-3 \
+#     --learning_rate=1e-3 \
+#     --num_warmup_steps=50 \
+#     --model_path=$model_path \
+#     --devices=cpu \
+#     --norm_type=2 \
+#     --max_grad_norm=1e2 \
+#     --comment_dropout_rate=0.2 \
+#     --comment_context_dropout_rate=0.4 \
+#     --early_stop=True \
+#     --patience=10 \
+#     > $log_file 2>&1 &
